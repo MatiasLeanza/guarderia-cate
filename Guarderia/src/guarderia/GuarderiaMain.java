@@ -8,6 +8,7 @@ import java.awt.event.MouseEvent;
 import java.time.LocalDate;
 import java.time.format.DateTimeParseException;
 import java.util.ArrayList;
+import java.util.List;
 
 class Guarderia {
     String nombre, direccion, telefono;
@@ -196,14 +197,47 @@ public class GuarderiaMain {
         btnAgregarEmpleado.addActionListener(e -> agregarEmpleado());
         btnAgregarAnimal.addActionListener(e -> agregarAnimal());
         btnSalir.addActionListener(e -> {
-            int opcion = JOptionPane.showConfirmDialog(null, 
-                "¿Está seguro que desea salir?", 
-                "Confirmar Salida", 
-                JOptionPane.YES_NO_OPTION,
-                JOptionPane.QUESTION_MESSAGE);
-            if (opcion == JOptionPane.YES_OPTION) {
-                System.exit(0);
-            }
+            // Usar un dialogo personalizado para confirmar la salida
+            JDialog confirmDialog = crearDialogoBase("Confirmar Salida", 400, 150, DANGER);
+            confirmDialog.setLayout(new BorderLayout(10, 10));
+            confirmDialog.setDefaultCloseOperation(JDialog.DISPOSE_ON_CLOSE);
+            
+            JPanel contentPanel = (JPanel) confirmDialog.getContentPane();
+            contentPanel.setLayout(new BorderLayout(20, 20));
+
+            JLabel titleLabel = new JLabel("Confirmar Salida");
+            titleLabel.setFont(new Font("Segoe UI", Font.BOLD, 22));
+            titleLabel.setForeground(TEXT_PRIMARY);
+
+            JLabel msgLabel = new JLabel("¿Está seguro que desea salir?", SwingConstants.CENTER);
+            msgLabel.setFont(new Font("Segoe UI", Font.PLAIN, 16));
+            msgLabel.setForeground(TEXT_PRIMARY);
+            
+            JPanel btnPanel = new JPanel(new FlowLayout(FlowLayout.CENTER, 15, 0));
+            btnPanel.setBackground(CARD_BG);
+            
+            JButton yesButton = crearBotonPrimario("Sí");
+            yesButton.setBackground(DANGER); // Botón de confirmación de salida en rojo
+            yesButton.addMouseListener(new MouseAdapter() {
+                @Override
+                public void mouseEntered(MouseEvent e) { yesButton.setBackground(DANGER_HOVER); }
+                @Override
+                public void mouseExited(MouseEvent e) { yesButton.setBackground(DANGER); }
+            });
+
+            JButton noButton = crearBotonSecundario("No");
+            
+            yesButton.addActionListener(ev -> System.exit(0));
+            noButton.addActionListener(ev -> confirmDialog.dispose());
+            
+            btnPanel.add(yesButton);
+            btnPanel.add(noButton);
+            
+            contentPanel.add(msgLabel, BorderLayout.CENTER);
+            contentPanel.add(btnPanel, BorderLayout.SOUTH);
+            
+            confirmDialog.setLocationRelativeTo(null);
+            confirmDialog.setVisible(true);
         });
         
         // Layout 2x3
@@ -285,7 +319,7 @@ public class GuarderiaMain {
         footer.setLayout(new FlowLayout(FlowLayout.CENTER));
         footer.setBorder(BorderFactory.createEmptyBorder(20, 0, 0, 0));
         
-        JLabel lblInfo = new JLabel("🏢 " + guarderia.nombre + " • " + guarderia.telefono);
+        JLabel lblInfo = new JLabel(guarderia.nombre + " • " + guarderia.telefono);
         lblInfo.setFont(new Font("Segoe UI", Font.PLAIN, 14));
         lblInfo.setForeground(TEXT_SECONDARY);
         
@@ -293,25 +327,93 @@ public class GuarderiaMain {
         return footer;
     }
 
-    static void mostrarDatosGuarderia() {
-        JDialog dialog = new JDialog((Frame) null, "Informacion de la Guarderia", true);
-        dialog.setSize(500, 300);
+    // --- Métodos de diálogo personalizados ---
+
+    // Nuevo método para crear un JDialog base con estilo moderno
+    static JDialog crearDialogoBase(String titulo, int width, int height, Color accentColor) {
+        JDialog dialog = new JDialog((Frame) null, titulo, true);
+        dialog.setSize(width, height);
         dialog.getContentPane().setBackground(CARD_BG);
-        dialog.setLayout(new BorderLayout(20, 20));
+        dialog.setLayout(new BorderLayout());
+        dialog.setResizable(false); 
+
+        // Añadir un borde superior con el color de acento
+        JPanel contentPanel = new JPanel(new BorderLayout(15, 15));
+        contentPanel.setBackground(CARD_BG);
+        contentPanel.setBorder(BorderFactory.createCompoundBorder(
+            BorderFactory.createMatteBorder(5, 0, 0, 0, accentColor), 
+            BorderFactory.createEmptyBorder(20, 20, 20, 20)
+        ));
+        dialog.add(contentPanel, BorderLayout.CENTER);
         
-        // Panel principal con información
+        return dialog;
+    }
+
+    // Método general para mostrar información (antes JOptionPane.showMessageDialog)
+    static void mostrarDialogoInfo(String titulo, String mensaje, String tipo) {
+        Color accentColor;
+        if ("error".equals(tipo)) {
+            accentColor = DANGER;
+        } else if ("success".equals(tipo)) {
+            accentColor = SUCCESS;
+        } else {
+            accentColor = PRIMARY; 
+        }
+
+        JDialog dialog = crearDialogoBase(titulo, 450, 200, accentColor);
+        JPanel contentPanel = (JPanel) dialog.getContentPane();
+        contentPanel.setLayout(new BorderLayout(20, 20));
+
+        // Título estilizado
+        JLabel titleLabel = new JLabel(titulo);
+        titleLabel.setFont(new Font("Segoe UI", Font.BOLD, 22));
+        titleLabel.setForeground(TEXT_PRIMARY);
+        contentPanel.add(titleLabel, BorderLayout.NORTH);
+
+        // Mensaje estilizado
+        JLabel msgLabel = new JLabel("<html><center>" + mensaje + "</center></html>", SwingConstants.CENTER);
+        msgLabel.setFont(new Font("Segoe UI", Font.PLAIN, 16));
+        msgLabel.setForeground(TEXT_PRIMARY);
+
+        // Botón de Aceptar
+        JButton btnOk = crearBotonPrimario("Aceptar");
+        btnOk.addActionListener(e -> dialog.dispose());
+        
+        if ("error".equals(tipo)) {
+             btnOk.setBackground(DANGER);
+             btnOk.addMouseListener(new MouseAdapter() {
+                @Override
+                public void mouseEntered(MouseEvent e) { btnOk.setBackground(DANGER_HOVER); }
+                @Override
+                public void mouseExited(MouseEvent e) { btnOk.setBackground(DANGER); }
+            });
+        }
+
+        JPanel btnPanel = new JPanel(new FlowLayout(FlowLayout.CENTER));
+        btnPanel.setBackground(CARD_BG);
+        btnPanel.add(btnOk);
+        
+        contentPanel.add(msgLabel, BorderLayout.CENTER);
+        contentPanel.add(btnPanel, BorderLayout.SOUTH);
+        
+        dialog.setLocationRelativeTo(null);
+        dialog.setVisible(true);
+    }
+
+    static void mostrarDatosGuarderia() {
+        JDialog dialog = crearDialogoBase("Informacion de la Guarderia", 550, 350, PRIMARY); 
+        JPanel contentPanel = (JPanel) dialog.getContentPane(); 
+
+        JLabel titleLabel = new JLabel("Informacion de la Guarderia");
+        titleLabel.setFont(new Font("Segoe UI", Font.BOLD, 22));
+        titleLabel.setForeground(TEXT_PRIMARY);
+        contentPanel.add(titleLabel, BorderLayout.NORTH);
+
         JPanel infoPanel = new JPanel();
         infoPanel.setLayout(new BoxLayout(infoPanel, BoxLayout.Y_AXIS));
         infoPanel.setBackground(CARD_BG);
-        infoPanel.setBorder(BorderFactory.createEmptyBorder(30, 30, 30, 30));
-        
-        // Título
-        JLabel titulo = new JLabel(guarderia.nombre);
-        titulo.setFont(new Font("Segoe UI", Font.BOLD, 24));
-        titulo.setForeground(TEXT_PRIMARY);
-        titulo.setAlignmentX(Component.LEFT_ALIGNMENT);
-        
-        // Información
+        infoPanel.setBorder(BorderFactory.createEmptyBorder(10, 0, 10, 0)); 
+
         String[] info = {
             "Direccion: " + guarderia.direccion,
             "Telefono: " + guarderia.telefono,
@@ -319,64 +421,42 @@ public class GuarderiaMain {
             "Animales registrados: " + animales.size()
         };
         
-        infoPanel.add(titulo);
-        infoPanel.add(Box.createVerticalStrut(20));
-        
         for (String dato : info) {
             JLabel label = new JLabel(dato);
             label.setFont(new Font("Segoe UI", Font.PLAIN, 16));
             label.setForeground(TEXT_SECONDARY);
             label.setAlignmentX(Component.LEFT_ALIGNMENT);
-            label.setBorder(BorderFactory.createEmptyBorder(8, 0, 8, 0));
+            label.setBorder(BorderFactory.createEmptyBorder(5, 0, 5, 0));
             infoPanel.add(label);
         }
         
-        // Botón cerrar
         JButton btnCerrar = crearBotonSecundario("Cerrar");
         btnCerrar.addActionListener(e -> dialog.dispose());
         
-        JPanel btnPanel = new JPanel(new FlowLayout());
+        JPanel btnPanel = new JPanel(new FlowLayout(FlowLayout.CENTER));
         btnPanel.setBackground(CARD_BG);
         btnPanel.add(btnCerrar);
         
-        dialog.add(infoPanel, BorderLayout.CENTER);
-        dialog.add(btnPanel, BorderLayout.SOUTH);
+        contentPanel.add(infoPanel, BorderLayout.CENTER);
+        contentPanel.add(btnPanel, BorderLayout.SOUTH);
         
         dialog.setLocationRelativeTo(null);
         dialog.setVisible(true);
     }
-    
-    static JButton crearBotonSecundario(String texto) {
-        JButton boton = new JButton(texto);
-        boton.setFont(new Font("Segoe UI", Font.BOLD, 14));
-        boton.setBackground(PRIMARY);
-        boton.setForeground(TEXT_PRIMARY);
-        boton.setFocusPainted(false);
-        boton.setBorderPainted(false);
-        boton.setPreferredSize(new Dimension(120, 40));
-        boton.setCursor(new Cursor(Cursor.HAND_CURSOR));
-        
-        boton.addMouseListener(new MouseAdapter() {
-            @Override
-            public void mouseEntered(MouseEvent e) {
-                boton.setBackground(PRIMARY_HOVER);
-            }
-            
-            @Override
-            public void mouseExited(MouseEvent e) {
-                boton.setBackground(PRIMARY);
-            }
-        });
-        
-        return boton;
-    }
 
     static void mostrarEmpleados() {
-        String[] opciones = {"Actualizar Empleado", "Cerrar"};
         if (empleados.isEmpty()) {
             mostrarDialogoInfo("Lista de Empleados", "No hay empleados registrados.", "info");
             return;
         }
+
+        JDialog dialog = crearDialogoBase("Lista de Empleados", 650, 450, SUCCESS); 
+        JPanel contentPanel = (JPanel) dialog.getContentPane();
+        
+        JLabel titleLabel = new JLabel("Lista de Empleados");
+        titleLabel.setFont(new Font("Segoe UI", Font.BOLD, 22));
+        titleLabel.setForeground(TEXT_PRIMARY);
+        contentPanel.add(titleLabel, BorderLayout.NORTH);
 
         StringBuilder sb = new StringBuilder();
         for (int i = 0; i < empleados.size(); i++) {
@@ -391,58 +471,70 @@ public class GuarderiaMain {
         JTextArea textArea = new JTextArea(sb.toString());
         textArea.setEditable(false);
         textArea.setFont(new Font("Segoe UI", Font.PLAIN, 14));
-        textArea.setBackground(CARD_BG);
+        textArea.setBackground(BACKGROUND); 
         textArea.setForeground(TEXT_PRIMARY);
         textArea.setBorder(BorderFactory.createEmptyBorder(15, 15, 15, 15));
+        textArea.setCaretColor(TEXT_PRIMARY); 
 
-        int opcion = JOptionPane.showOptionDialog(null, new JScrollPane(textArea), "👥 Lista de Empleados",
-                JOptionPane.DEFAULT_OPTION, JOptionPane.INFORMATION_MESSAGE, null, opciones, opciones[1]);
+        JScrollPane scrollPane = new JScrollPane(textArea);
+        scrollPane.setBorder(BorderFactory.createLineBorder(new Color(60, 60, 67), 1)); 
+        scrollPane.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED);
+        scrollPane.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
+        
+        scrollPane.getVerticalScrollBar().setUI(new ModernScrollBarUI());
+        scrollPane.getHorizontalScrollBar().setUI(new ModernScrollBarUI());
 
-        if (opcion == 0) {
-            String indexStr = JOptionPane.showInputDialog("Ingrese el número de empleado a actualizar:");
+        JPanel buttonPanel = new JPanel(new FlowLayout(FlowLayout.CENTER, 15, 0));
+        buttonPanel.setBackground(CARD_BG);
+
+        JButton btnActualizar = crearBotonPrimario("Actualizar Empleado");
+        JButton btnCerrar = crearBotonSecundario("Cerrar");
+
+        btnActualizar.addActionListener(e -> {
+            String indexStr = JOptionPane.showInputDialog(dialog, "Ingrese el número de empleado a actualizar:", "Actualizar Empleado", JOptionPane.PLAIN_MESSAGE);
             try {
-                int index = Integer.parseInt(indexStr);
-                if (index < 0 || index >= empleados.size()) throw new IndexOutOfBoundsException();
-                actualizarEmpleado(index);
-            } catch (Exception e) {
-                mostrarDialogoInfo("Error", "Número invalido.", "error");
+                if (indexStr != null) { 
+                    int index = Integer.parseInt(indexStr.trim());
+                    if (index < 0 || index >= empleados.size()) {
+                        throw new IndexOutOfBoundsException();
+                    }
+                    dialog.dispose(); 
+                    actualizarEmpleado(index);
+                }
+            } catch (NumberFormatException ex) {
+                mostrarDialogoInfo("Error", "Número inválido. Ingrese un número entero.", "error");
+            } catch (IndexOutOfBoundsException ex) {
+                mostrarDialogoInfo("Error", "El número de empleado no existe.", "error");
+            } catch (Exception ex) {
+                mostrarDialogoInfo("Error", "Error inesperado al actualizar empleado.", "error");
             }
-        }
+        });
+
+        btnCerrar.addActionListener(e -> dialog.dispose());
+
+        buttonPanel.add(btnActualizar);
+        buttonPanel.add(btnCerrar);
+
+        contentPanel.add(scrollPane, BorderLayout.CENTER);
+        contentPanel.add(buttonPanel, BorderLayout.SOUTH);
+
+        dialog.setLocationRelativeTo(null);
+        dialog.setVisible(true);
     }
     
-    static void mostrarDialogoInfo(String titulo, String mensaje, String tipo) {
-        String icono = tipo.equals("error") ? "❌" : tipo.equals("success") ? "✅" : "ℹ️";
-        JOptionPane.showMessageDialog(null, icono + " " + mensaje, titulo, JOptionPane.INFORMATION_MESSAGE);
-    }
-
-    static void actualizarEmpleado(int index) {
-        Empleado emp = empleados.get(index);
-
-        JTextField nombre = new JTextField(emp.nombre);
-        JTextField apellido = new JTextField(emp.apellido);
-        JTextField cargo = new JTextField(emp.cargo);
-        JTextField dni = new JTextField(String.valueOf(emp.dni));
-        JTextField telefono = new JTextField(String.valueOf(emp.telefono));
-
-        String[] etiquetas = {"Nombre:", "Apellido:", "Cargo:", "DNI:", "Teléfono:"};
-        JTextField[] campos = {nombre, apellido, cargo, dni, telefono};
-
-        mostrarDialogoValidacion("Actualizar Empleado", campos, etiquetas, () -> {
-            emp.nombre = nombre.getText();
-            emp.apellido = apellido.getText();
-            emp.cargo = cargo.getText();
-            emp.dni = Integer.parseInt(dni.getText());
-            emp.telefono = Long.parseLong(telefono.getText());
-            mostrarDialogoInfo("Exito", "Empleado actualizado correctamente.", "success");
-        }, GuarderiaMain::validarEmpleado);
-    }
-
     static void mostrarAnimales() {
-        String[] opciones = {"Actualizar Animal", "Cerrar"};
         if (animales.isEmpty()) {
             mostrarDialogoInfo("Lista de Animales", "No hay animales registrados.", "info");
             return;
         }
+
+        JDialog dialog = crearDialogoBase("Lista de Animales", 700, 500, PURPLE); 
+        JPanel contentPanel = (JPanel) dialog.getContentPane();
+
+        JLabel titleLabel = new JLabel("Lista de Animales");
+        titleLabel.setFont(new Font("Segoe UI", Font.BOLD, 22));
+        titleLabel.setForeground(TEXT_PRIMARY);
+        contentPanel.add(titleLabel, BorderLayout.NORTH);
 
         StringBuilder sb = new StringBuilder();
         for (int i = 0; i < animales.size(); i++) {
@@ -466,23 +558,75 @@ public class GuarderiaMain {
         JTextArea textArea = new JTextArea(sb.toString());
         textArea.setEditable(false);
         textArea.setFont(new Font("Segoe UI", Font.PLAIN, 14));
-        textArea.setBackground(CARD_BG);
+        textArea.setBackground(BACKGROUND);
         textArea.setForeground(TEXT_PRIMARY);
         textArea.setBorder(BorderFactory.createEmptyBorder(15, 15, 15, 15));
+        textArea.setCaretColor(TEXT_PRIMARY);
 
-        int opcion = JOptionPane.showOptionDialog(null, new JScrollPane(textArea), "🐾 Lista de Animales",
-                JOptionPane.DEFAULT_OPTION, JOptionPane.INFORMATION_MESSAGE, null, opciones, opciones[1]);
+        JScrollPane scrollPane = new JScrollPane(textArea);
+        scrollPane.setBorder(BorderFactory.createLineBorder(new Color(60, 60, 67), 1));
+        scrollPane.getVerticalScrollBar().setUI(new ModernScrollBarUI());
+        scrollPane.getHorizontalScrollBar().setUI(new ModernScrollBarUI());
 
-        if (opcion == 0) {
-            String indexStr = JOptionPane.showInputDialog("Ingrese el numero de animal a actualizar:");
+
+        JPanel buttonPanel = new JPanel(new FlowLayout(FlowLayout.CENTER, 15, 0));
+        buttonPanel.setBackground(CARD_BG);
+
+        JButton btnActualizar = crearBotonPrimario("Actualizar Animal");
+        JButton btnCerrar = crearBotonSecundario("Cerrar");
+
+        btnActualizar.addActionListener(e -> {
+            String indexStr = JOptionPane.showInputDialog(dialog, "Ingrese el numero de animal a actualizar:", "Actualizar Animal", JOptionPane.PLAIN_MESSAGE);
             try {
-                int index = Integer.parseInt(indexStr);
-                if (index < 0 || index >= animales.size()) throw new IndexOutOfBoundsException();
-                actualizarAnimal(index);
-            } catch (Exception e) {
-                mostrarDialogoInfo("Error", "Numero invalido.", "error");
+                if (indexStr != null) { 
+                    int index = Integer.parseInt(indexStr.trim());
+                    if (index < 0 || index >= animales.size()) {
+                        throw new IndexOutOfBoundsException();
+                    }
+                    dialog.dispose(); 
+                    actualizarAnimal(index);
+                }
+            } catch (NumberFormatException ex) {
+                mostrarDialogoInfo("Error", "Número inválido. Ingrese un número entero.", "error");
+            } catch (IndexOutOfBoundsException ex) {
+                mostrarDialogoInfo("Error", "El número de animal no existe.", "error");
+            } catch (Exception ex) {
+                mostrarDialogoInfo("Error", "Error inesperado al actualizar animal.", "error");
             }
-        }
+        });
+
+        btnCerrar.addActionListener(e -> dialog.dispose());
+
+        buttonPanel.add(btnActualizar);
+        buttonPanel.add(btnCerrar);
+
+        contentPanel.add(scrollPane, BorderLayout.CENTER);
+        contentPanel.add(buttonPanel, BorderLayout.SOUTH);
+
+        dialog.setLocationRelativeTo(null);
+        dialog.setVisible(true);
+    }
+
+    static void actualizarEmpleado(int index) {
+        Empleado emp = empleados.get(index);
+
+        JTextField nombre = new JTextField(emp.nombre);
+        JTextField apellido = new JTextField(emp.apellido);
+        JTextField cargo = new JTextField(emp.cargo);
+        JTextField dni = new JTextField(String.valueOf(emp.dni));
+        JTextField telefono = new JTextField(String.valueOf(emp.telefono));
+
+        String[] etiquetas = {"Nombre:", "Apellido:", "Cargo:", "DNI:", "Teléfono:"};
+        JTextField[] campos = {nombre, apellido, cargo, dni, telefono};
+
+        mostrarDialogoValidacion("Actualizar Empleado", campos, etiquetas, () -> {
+            emp.nombre = nombre.getText();
+            emp.apellido = apellido.getText();
+            emp.cargo = cargo.getText();
+            emp.dni = Integer.parseInt(dni.getText());
+            emp.telefono = Long.parseLong(telefono.getText());
+            mostrarDialogoInfo("Exito", "Empleado actualizado correctamente.", "success");
+        }, GuarderiaMain::validarEmpleado, SUCCESS); 
     }
 
     static void actualizarAnimal(int index) {
@@ -525,7 +669,7 @@ public class GuarderiaMain {
             a.historial.vacunas = vacunas.getText();
             a.historial.ultimaRevision = LocalDate.parse(ultimaRevision.getText());
             mostrarDialogoInfo("Exito", "Animal actualizado correctamente.", "success");
-        }, GuarderiaMain::validarAnimal);
+        }, GuarderiaMain::validarAnimal, PURPLE); 
     }
 
     static void agregarEmpleado() {
@@ -547,7 +691,7 @@ public class GuarderiaMain {
                     Long.parseLong(telefono.getText())
             ));
             mostrarDialogoInfo("Exito", "Empleado agregado correctamente.", "success");
-        }, GuarderiaMain::validarEmpleado);
+        }, GuarderiaMain::validarEmpleado, WARNING); 
     }
 
     static void agregarAnimal() {
@@ -596,20 +740,19 @@ public class GuarderiaMain {
                     historial
             ));
             mostrarDialogoInfo("Exito", "Animal agregado correctamente.", "success");
-        }, GuarderiaMain::validarAnimal);
+        }, GuarderiaMain::validarAnimal, new Color(255, 45, 85)); 
     }
 
-    // Método común para mostrar diálogo con validación y resaltado de campos erróneos - MODERNIZADO
-    static void mostrarDialogoValidacion(String titulo, JTextField[] campos, String[] etiquetas, Runnable onSuccess, Validador validador) {
-        JDialog dialog = new JDialog((Frame) null, titulo, true);
-        dialog.setSize(600, 500);
-        dialog.getContentPane().setBackground(CARD_BG);
-        
-        JPanel mainPanel = new JPanel(new BorderLayout(20, 20));
-        mainPanel.setBackground(CARD_BG);
-        mainPanel.setBorder(BorderFactory.createEmptyBorder(25, 25, 25, 25));
-        
-        // Panel del formulario
+    static void mostrarDialogoValidacion(String titulo, JTextField[] campos, String[] etiquetas, Runnable onSuccess, Validador validador, Color accentColor) {
+        JDialog dialog = crearDialogoBase(titulo, 600, 550, accentColor);
+        JPanel mainPanel = (JPanel) dialog.getContentPane();
+        mainPanel.setLayout(new BorderLayout(20, 20)); 
+
+        JLabel titleLabel = new JLabel(titulo);
+        titleLabel.setFont(new Font("Segoe UI", Font.BOLD, 22));
+        titleLabel.setForeground(TEXT_PRIMARY);
+        mainPanel.add(titleLabel, BorderLayout.NORTH);
+
         JPanel formPanel = new JPanel(new GridBagLayout());
         formPanel.setBackground(CARD_BG);
         GridBagConstraints gbc = new GridBagConstraints();
@@ -617,7 +760,6 @@ public class GuarderiaMain {
         gbc.anchor = GridBagConstraints.WEST;
 
         for (int i = 0; i < campos.length; i++) {
-            // Label
             gbc.gridx = 0;
             gbc.gridy = i;
             gbc.weightx = 0.3;
@@ -628,12 +770,10 @@ public class GuarderiaMain {
             label.setPreferredSize(new Dimension(180, 25));
             formPanel.add(label, gbc);
 
-            // Campo
             gbc.gridx = 1;
             gbc.weightx = 0.7;
             gbc.fill = GridBagConstraints.HORIZONTAL;
             
-            // Estilizar campo de texto
             campos[i].setFont(new Font("Segoe UI", Font.PLAIN, 14));
             campos[i].setBackground(BACKGROUND);
             campos[i].setForeground(TEXT_PRIMARY);
@@ -647,7 +787,6 @@ public class GuarderiaMain {
             formPanel.add(campos[i], gbc);
         }
 
-        // Panel de botones modernos
         JPanel buttonPanel = new JPanel(new FlowLayout(FlowLayout.CENTER, 15, 0));
         buttonPanel.setBackground(CARD_BG);
         
@@ -660,18 +799,15 @@ public class GuarderiaMain {
         mainPanel.add(formPanel, BorderLayout.CENTER);
         mainPanel.add(buttonPanel, BorderLayout.SOUTH);
         
-        dialog.add(mainPanel);
         dialog.setLocationRelativeTo(null);
 
         btnOk.addActionListener(e -> {
-            // Resetear bordes
             for (JTextField tf : campos) {
                 tf.setBorder(BorderFactory.createCompoundBorder(
                     BorderFactory.createLineBorder(new Color(60, 60, 67), 1),
                     BorderFactory.createEmptyBorder(8, 12, 8, 12)
                 ));
             }
-            // Validar
             int[] errores = validador.validar(campos);
             if (errores.length == 0) {
                 try {
@@ -681,7 +817,6 @@ public class GuarderiaMain {
                     mostrarDialogoInfo("Error", "Error inesperado: " + ex.getMessage(), "error");
                 }
             } else {
-                // Marcar bordes en rojo
                 for (int idx : errores) {
                     campos[idx].setBorder(BorderFactory.createCompoundBorder(
                         BorderFactory.createLineBorder(DANGER, 2),
@@ -722,14 +857,37 @@ public class GuarderiaMain {
         return boton;
     }
 
-    // Interfaz funcional para validador
+    static JButton crearBotonSecundario(String texto) {
+        JButton boton = new JButton(texto);
+        boton.setFont(new Font("Segoe UI", Font.BOLD, 14));
+        boton.setBackground(PRIMARY);
+        boton.setForeground(TEXT_PRIMARY);
+        boton.setFocusPainted(false);
+        boton.setBorderPainted(false);
+        boton.setPreferredSize(new Dimension(120, 40));
+        boton.setCursor(new Cursor(Cursor.HAND_CURSOR));
+        
+        boton.addMouseListener(new MouseAdapter() {
+            @Override
+            public void mouseEntered(MouseEvent e) {
+                boton.setBackground(PRIMARY_HOVER);
+            }
+            
+            @Override
+            public void mouseExited(MouseEvent e) {
+                boton.setBackground(PRIMARY);
+            }
+        });
+        
+        return boton;
+    }
+
     interface Validador {
         int[] validar(JTextField[] campos);
     }
 
-    // Validación para empleado (nombre, apellido, cargo no vacíos, dni entero > 0, teléfono long > 0)
     static int[] validarEmpleado(JTextField[] campos) {
-        java.util.List<Integer> errores = new ArrayList<>();
+        List<Integer> errores = new ArrayList<>();
         if (campos[0].getText().trim().isEmpty()) errores.add(0);
         if (campos[1].getText().trim().isEmpty()) errores.add(1);
         if (campos[2].getText().trim().isEmpty()) errores.add(2);
@@ -748,13 +906,12 @@ public class GuarderiaMain {
         return errores.stream().mapToInt(i -> i).toArray();
     }
 
-    // Validación para animal (nombre y especie no vacíos, dueño con nombre, apellido, dni, teléfono válidos, historial con fecha válida)
     static int[] validarAnimal(JTextField[] campos) {
-        java.util.List<Integer> errores = new ArrayList<>();
-        if (campos[0].getText().trim().isEmpty()) errores.add(0); // nombre animal
-        if (campos[1].getText().trim().isEmpty()) errores.add(1); // especie
-        if (campos[2].getText().trim().isEmpty()) errores.add(2); // dueño nombre
-        if (campos[3].getText().trim().isEmpty()) errores.add(3); // dueño apellido
+        List<Integer> errores = new ArrayList<>();
+        if (campos[0].getText().trim().isEmpty()) errores.add(0); 
+        if (campos[1].getText().trim().isEmpty()) errores.add(1); 
+        if (campos[2].getText().trim().isEmpty()) errores.add(2); 
+        if (campos[3].getText().trim().isEmpty()) errores.add(3); 
         try {
             int dni = Integer.parseInt(campos[4].getText().trim());
             if (dni <= 0) errores.add(4);
@@ -767,12 +924,71 @@ public class GuarderiaMain {
         } catch (NumberFormatException e) {
             errores.add(5);
         }
-        // enfermedades y vacunas pueden estar vacíos
         try {
             LocalDate.parse(campos[8].getText().trim());
         } catch (DateTimeParseException e) {
             errores.add(8);
         }
         return errores.stream().mapToInt(i -> i).toArray();
+    }
+
+    static class ModernScrollBarUI extends javax.swing.plaf.basic.BasicScrollBarUI {
+        private final Dimension thumbMinSize = new Dimension(10, 10); 
+
+        @Override
+        protected void configureScrollBarColors() {
+            this.thumbColor = new Color(70, 70, 75); 
+            this.trackColor = CARD_BG; 
+            this.trackHighlightColor = CARD_BG; 
+            this.thumbDarkShadowColor = new Color(50, 50, 55); 
+            this.thumbLightShadowColor = new Color(90, 90, 95); 
+            this.scrollbar.setBackground(CARD_BG);
+        }
+
+        @Override
+        protected JButton createDecreaseButton(int orientation) {
+            return createZeroButton();
+        }
+
+        @Override
+        protected JButton createIncreaseButton(int orientation) {
+            return createZeroButton();
+        }
+
+        private JButton createZeroButton() {
+            JButton button = new JButton();
+            button.setPreferredSize(new Dimension(0, 0));
+            button.setMinimumSize(new Dimension(0, 0));
+            button.setMaximumSize(new Dimension(0, 0));
+            return button;
+        }
+
+        @Override
+        protected void paintTrack(Graphics g, JComponent c, Rectangle trackBounds) {
+            Graphics2D g2 = (Graphics2D) g.create();
+            g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+            g2.setColor(trackColor);
+            g2.fillRect(trackBounds.x, trackBounds.y, trackBounds.width, trackBounds.height);
+            g2.dispose();
+        }
+
+        @Override
+        protected void paintThumb(Graphics g, JComponent c, Rectangle thumbBounds) {
+            if (thumbBounds.isEmpty() || !scrollbar.isEnabled()) {
+                return;
+            }
+
+            Graphics2D g2 = (Graphics2D) g.create();
+            g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+
+            g2.setColor(thumbColor);
+            g2.fillRoundRect(thumbBounds.x, thumbBounds.y, thumbBounds.width, thumbBounds.height, 10, 10); 
+            g2.dispose();
+        }
+
+        @Override
+        protected Dimension getMinimumThumbSize() {
+            return thumbMinSize;
+        }
     }
 }
