@@ -3,6 +3,8 @@ package guarderia;
 import javax.swing.*;
 import javax.swing.border.LineBorder;
 import java.awt.*;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
 import java.time.LocalDate;
 import java.time.format.DateTimeParseException;
 import java.util.ArrayList;
@@ -67,69 +69,312 @@ public class GuarderiaMain {
     static Guarderia guarderia = new Guarderia("Linares", "Av. Lope de Vega y Baigorria", "1112345678");
     static ArrayList<Empleado> empleados = new ArrayList<>();
     static ArrayList<Animal> animales = new ArrayList<>();
+    
+    // Colores del tema moderno
+    static final Color BACKGROUND = new Color(18, 18, 18);           // Fondo oscuro principal
+    static final Color CARD_BG = new Color(28, 28, 30);             // Fondo de tarjetas
+    static final Color PRIMARY = new Color(0, 122, 255);            // Azul principal
+    static final Color PRIMARY_HOVER = new Color(10, 132, 255);     // Azul hover
+    static final Color SUCCESS = new Color(52, 199, 89);            // Verde éxito
+    static final Color SUCCESS_HOVER = new Color(62, 209, 99);      // Verde hover
+    static final Color WARNING = new Color(255, 149, 0);           // Naranja advertencia  
+    static final Color WARNING_HOVER = new Color(255, 159, 10);     // Naranja hover
+    static final Color DANGER = new Color(255, 59, 48);            // Rojo peligro
+    static final Color DANGER_HOVER = new Color(255, 69, 58);       // Rojo hover
+    static final Color TEXT_PRIMARY = new Color(255, 255, 255);     // Texto principal
+    static final Color TEXT_SECONDARY = new Color(174, 174, 178);   // Texto secundario
+    static final Color PURPLE = new Color(175, 82, 222);           // Púrpura
+    static final Color PURPLE_HOVER = new Color(185, 92, 232);      // Púrpura hover
 
     public static void main(String[] args) {
+        // Configurar look and feel más moderno
+        try {
+            UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
+        } catch (Exception e) {
+            // Si hay error, usar el look and feel por defecto
+            try {
+                UIManager.setLookAndFeel(UIManager.getCrossPlatformLookAndFeelClassName());
+            } catch (Exception ex) {
+                // Continuar con el look and feel por defecto
+            }
+        }
+        
         SwingUtilities.invokeLater(GuarderiaMain::crearVentanaPrincipal);
     }
 
     public static void crearVentanaPrincipal() {
-        JFrame ventana = new JFrame("Guardería de Mascotas");
+        JFrame ventana = new JFrame("Guarderia de Mascotas - Sistema de Gestión");
         ventana.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        ventana.setSize(450, 450);
-        ventana.setLayout(new GridLayout(0, 1, 10, 10));  // separación entre botones
-
-        JButton btnDatosGuarderia = new JButton("Datos Guardería");
-        JButton btnDatosEmpleados = new JButton("Ver Empleados");
-        JButton btnDatosAnimales = new JButton("Ver Animales");
-        JButton btnAgregarEmpleado = new JButton("Agregar Empleado");
-        JButton btnAgregarAnimal = new JButton("Agregar Animal");
-        JButton btnSalir = new JButton("Salir");
-
-        // Colores más amigables y un degrade básico con panel sobre botón salir:
-        btnDatosGuarderia.setBackground(new Color(135, 206, 235));  // cielo claro
-        btnDatosEmpleados.setBackground(new Color(144, 238, 144));  // verde claro
-        btnDatosAnimales.setBackground(new Color(255, 228, 181));   // beige claro
-        btnAgregarEmpleado.setBackground(new Color(176, 224, 230)); // azul claro
-        btnAgregarAnimal.setBackground(new Color(255, 218, 185));   // melocotón
-        btnSalir.setBackground(new Color(255, 99, 71));             // rojo tomate
-        btnSalir.setForeground(Color.white);
-
-        // Que los botones no pierdan el color al seleccionarse
-        for (JButton b : new JButton[]{btnDatosGuarderia, btnDatosEmpleados, btnDatosAnimales, btnAgregarEmpleado, btnAgregarAnimal, btnSalir}) {
-            b.setOpaque(true);
-            b.setBorderPainted(false);
-        }
-
+        ventana.setSize(900, 700);
+        ventana.setMinimumSize(new Dimension(800, 600));
+        ventana.getContentPane().setBackground(BACKGROUND);
+        
+        // Panel principal con padding
+        JPanel mainPanel = new JPanel();
+        mainPanel.setLayout(new BorderLayout(20, 20));
+        mainPanel.setBackground(BACKGROUND);
+        mainPanel.setBorder(BorderFactory.createEmptyBorder(30, 30, 30, 30));
+        
+        // Header con título y subtítulo
+        JPanel headerPanel = crearHeader();
+        
+        // Panel de botones con grid moderno
+        JPanel buttonPanel = crearPanelBotones();
+        
+        // Footer con información
+        JPanel footerPanel = crearFooter();
+        
+        mainPanel.add(headerPanel, BorderLayout.NORTH);
+        mainPanel.add(buttonPanel, BorderLayout.CENTER);
+        mainPanel.add(footerPanel, BorderLayout.SOUTH);
+        
+        ventana.add(mainPanel);
+        ventana.setLocationRelativeTo(null);
+        ventana.setVisible(true);
+    }
+    
+    static JPanel crearHeader() {
+        JPanel header = new JPanel();
+        header.setLayout(new BoxLayout(header, BoxLayout.Y_AXIS));
+        header.setBackground(BACKGROUND);
+        header.setBorder(BorderFactory.createEmptyBorder(0, 0, 20, 0));
+        
+        // Título principal
+        JLabel titulo = new JLabel("Guarderia de Mascotas");
+        titulo.setFont(new Font("Segoe UI", Font.BOLD, 32));
+        titulo.setForeground(TEXT_PRIMARY);
+        titulo.setAlignmentX(Component.CENTER_ALIGNMENT);
+        
+        // Subtítulo
+        JLabel subtitulo = new JLabel("Sistema de Gestion Integral");
+        subtitulo.setFont(new Font("Segoe UI", Font.PLAIN, 16));
+        subtitulo.setForeground(TEXT_SECONDARY);
+        subtitulo.setAlignmentX(Component.CENTER_ALIGNMENT);
+        
+        // Línea decorativa
+        JPanel linePanel = new JPanel();
+        linePanel.setBackground(PRIMARY);
+        linePanel.setPreferredSize(new Dimension(200, 3));
+        linePanel.setMaximumSize(new Dimension(200, 3));
+        
+        header.add(titulo);
+        header.add(Box.createVerticalStrut(8));
+        header.add(subtitulo);
+        header.add(Box.createVerticalStrut(15));
+        
+        JPanel lineContainer = new JPanel();
+        lineContainer.setBackground(BACKGROUND);
+        lineContainer.add(linePanel);
+        header.add(lineContainer);
+        
+        return header;
+    }
+    
+    static JPanel crearPanelBotones() {
+        JPanel panel = new JPanel(new GridBagLayout());
+        panel.setBackground(BACKGROUND);
+        GridBagConstraints gbc = new GridBagConstraints();
+        
+        // Configuración base para botones
+        gbc.insets = new Insets(15, 15, 15, 15);
+        gbc.fill = GridBagConstraints.BOTH;
+        gbc.weightx = 1.0;
+        gbc.weighty = 1.0;
+        
+        // Crear botones modernos
+        JButton btnDatosGuarderia = crearBotonModerno("Datos Guarderia", "Información de la guarderia", PRIMARY, PRIMARY_HOVER);
+        JButton btnDatosEmpleados = crearBotonModerno("Ver Empleados", "Lista de empleados registrados", SUCCESS, SUCCESS_HOVER);
+        JButton btnDatosAnimales = crearBotonModerno("Ver Animales", "Lista de mascotas registradas", PURPLE, PURPLE_HOVER);
+        JButton btnAgregarEmpleado = crearBotonModerno("Agregar Empleado", "Registrar nuevo empleado", WARNING, WARNING_HOVER);
+        JButton btnAgregarAnimal = crearBotonModerno("Agregar Animal", "Registrar nueva mascota", new Color(255, 45, 85), new Color(255, 55, 95));
+        JButton btnSalir = crearBotonModerno("Salir", "Cerrar aplicacion", DANGER, DANGER_HOVER);
+        
+        // Agregar funcionalidad a botones
         btnDatosGuarderia.addActionListener(e -> mostrarDatosGuarderia());
         btnDatosEmpleados.addActionListener(e -> mostrarEmpleados());
         btnDatosAnimales.addActionListener(e -> mostrarAnimales());
         btnAgregarEmpleado.addActionListener(e -> agregarEmpleado());
         btnAgregarAnimal.addActionListener(e -> agregarAnimal());
-        btnSalir.addActionListener(e -> System.exit(0));
-
-        ventana.add(btnDatosGuarderia);
-        ventana.add(btnDatosEmpleados);
-        ventana.add(btnDatosAnimales);
-        ventana.add(btnAgregarEmpleado);
-        ventana.add(btnAgregarAnimal);
-        ventana.add(btnSalir);
-
-        ventana.setLocationRelativeTo(null);
-        ventana.setVisible(true);
+        btnSalir.addActionListener(e -> {
+            int opcion = JOptionPane.showConfirmDialog(null, 
+                "¿Está seguro que desea salir?", 
+                "Confirmar Salida", 
+                JOptionPane.YES_NO_OPTION,
+                JOptionPane.QUESTION_MESSAGE);
+            if (opcion == JOptionPane.YES_OPTION) {
+                System.exit(0);
+            }
+        });
+        
+        // Layout 2x3
+        gbc.gridx = 0; gbc.gridy = 0;
+        panel.add(btnDatosGuarderia, gbc);
+        
+        gbc.gridx = 1; gbc.gridy = 0;
+        panel.add(btnDatosEmpleados, gbc);
+        
+        gbc.gridx = 0; gbc.gridy = 1;
+        panel.add(btnDatosAnimales, gbc);
+        
+        gbc.gridx = 1; gbc.gridy = 1;
+        panel.add(btnAgregarEmpleado, gbc);
+        
+        gbc.gridx = 0; gbc.gridy = 2;
+        panel.add(btnAgregarAnimal, gbc);
+        
+        gbc.gridx = 1; gbc.gridy = 2;
+        panel.add(btnSalir, gbc);
+        
+        return panel;
+    }
+    
+    static JButton crearBotonModerno(String texto, String descripcion, Color color, Color colorHover) {
+        JButton boton = new JButton();
+        boton.setLayout(new BorderLayout());
+        boton.setPreferredSize(new Dimension(250, 120));
+        boton.setBackground(color);
+        boton.setForeground(TEXT_PRIMARY);
+        boton.setFocusPainted(false);
+        boton.setBorderPainted(false);
+        boton.setOpaque(true);
+        boton.setCursor(new Cursor(Cursor.HAND_CURSOR));
+        
+        // Panel interno para el contenido
+        JPanel contenido = new JPanel();
+        contenido.setLayout(new BoxLayout(contenido, BoxLayout.Y_AXIS));
+        contenido.setOpaque(false);
+        contenido.setBorder(BorderFactory.createEmptyBorder(15, 15, 15, 15));
+        
+        // Texto principal
+        JLabel lblTexto = new JLabel(texto);
+        lblTexto.setFont(new Font("Segoe UI", Font.BOLD, 16));
+        lblTexto.setForeground(TEXT_PRIMARY);
+        lblTexto.setAlignmentX(Component.CENTER_ALIGNMENT);
+        
+        // Descripción
+        JLabel lblDesc = new JLabel("<html><center>" + descripcion + "</center></html>");
+        lblDesc.setFont(new Font("Segoe UI", Font.PLAIN, 12));
+        lblDesc.setForeground(new Color(255, 255, 255, 180));
+        lblDesc.setAlignmentX(Component.CENTER_ALIGNMENT);
+        
+        contenido.add(lblTexto);
+        contenido.add(Box.createVerticalStrut(8));
+        contenido.add(lblDesc);
+        
+        boton.add(contenido, BorderLayout.CENTER);
+        
+        // Efectos hover
+        boton.addMouseListener(new MouseAdapter() {
+            @Override
+            public void mouseEntered(MouseEvent e) {
+                boton.setBackground(colorHover);
+            }
+            
+            @Override
+            public void mouseExited(MouseEvent e) {
+                boton.setBackground(color);
+            }
+        });
+        
+        return boton;
+    }
+    
+    static JPanel crearFooter() {
+        JPanel footer = new JPanel();
+        footer.setBackground(BACKGROUND);
+        footer.setLayout(new FlowLayout(FlowLayout.CENTER));
+        footer.setBorder(BorderFactory.createEmptyBorder(20, 0, 0, 0));
+        
+        JLabel lblInfo = new JLabel("🏢 " + guarderia.nombre + " • " + guarderia.telefono);
+        lblInfo.setFont(new Font("Segoe UI", Font.PLAIN, 14));
+        lblInfo.setForeground(TEXT_SECONDARY);
+        
+        footer.add(lblInfo);
+        return footer;
     }
 
     static void mostrarDatosGuarderia() {
-        JOptionPane.showMessageDialog(null,
-                "Nombre: " + guarderia.nombre +
-                        "\nDirección: " + guarderia.direccion +
-                        "\nTeléfono: " + guarderia.telefono,
-                "Datos de la Guardería", JOptionPane.INFORMATION_MESSAGE);
+        JDialog dialog = new JDialog((Frame) null, "Informacion de la Guarderia", true);
+        dialog.setSize(500, 300);
+        dialog.getContentPane().setBackground(CARD_BG);
+        dialog.setLayout(new BorderLayout(20, 20));
+        
+        // Panel principal con información
+        JPanel infoPanel = new JPanel();
+        infoPanel.setLayout(new BoxLayout(infoPanel, BoxLayout.Y_AXIS));
+        infoPanel.setBackground(CARD_BG);
+        infoPanel.setBorder(BorderFactory.createEmptyBorder(30, 30, 30, 30));
+        
+        // Título
+        JLabel titulo = new JLabel(guarderia.nombre);
+        titulo.setFont(new Font("Segoe UI", Font.BOLD, 24));
+        titulo.setForeground(TEXT_PRIMARY);
+        titulo.setAlignmentX(Component.LEFT_ALIGNMENT);
+        
+        // Información
+        String[] info = {
+            "Direccion: " + guarderia.direccion,
+            "Telefono: " + guarderia.telefono,
+            "Empleados registrados: " + empleados.size(),
+            "Animales registrados: " + animales.size()
+        };
+        
+        infoPanel.add(titulo);
+        infoPanel.add(Box.createVerticalStrut(20));
+        
+        for (String dato : info) {
+            JLabel label = new JLabel(dato);
+            label.setFont(new Font("Segoe UI", Font.PLAIN, 16));
+            label.setForeground(TEXT_SECONDARY);
+            label.setAlignmentX(Component.LEFT_ALIGNMENT);
+            label.setBorder(BorderFactory.createEmptyBorder(8, 0, 8, 0));
+            infoPanel.add(label);
+        }
+        
+        // Botón cerrar
+        JButton btnCerrar = crearBotonSecundario("Cerrar");
+        btnCerrar.addActionListener(e -> dialog.dispose());
+        
+        JPanel btnPanel = new JPanel(new FlowLayout());
+        btnPanel.setBackground(CARD_BG);
+        btnPanel.add(btnCerrar);
+        
+        dialog.add(infoPanel, BorderLayout.CENTER);
+        dialog.add(btnPanel, BorderLayout.SOUTH);
+        
+        dialog.setLocationRelativeTo(null);
+        dialog.setVisible(true);
+    }
+    
+    static JButton crearBotonSecundario(String texto) {
+        JButton boton = new JButton(texto);
+        boton.setFont(new Font("Segoe UI", Font.BOLD, 14));
+        boton.setBackground(PRIMARY);
+        boton.setForeground(TEXT_PRIMARY);
+        boton.setFocusPainted(false);
+        boton.setBorderPainted(false);
+        boton.setPreferredSize(new Dimension(120, 40));
+        boton.setCursor(new Cursor(Cursor.HAND_CURSOR));
+        
+        boton.addMouseListener(new MouseAdapter() {
+            @Override
+            public void mouseEntered(MouseEvent e) {
+                boton.setBackground(PRIMARY_HOVER);
+            }
+            
+            @Override
+            public void mouseExited(MouseEvent e) {
+                boton.setBackground(PRIMARY);
+            }
+        });
+        
+        return boton;
     }
 
     static void mostrarEmpleados() {
         String[] opciones = {"Actualizar Empleado", "Cerrar"};
         if (empleados.isEmpty()) {
-            JOptionPane.showMessageDialog(null, "No hay empleados registrados.", "Lista de Empleados", JOptionPane.INFORMATION_MESSAGE);
+            mostrarDialogoInfo("Lista de Empleados", "No hay empleados registrados.", "info");
             return;
         }
 
@@ -142,10 +387,15 @@ public class GuarderiaMain {
                     .append(" | DNI: ").append(e.dni)
                     .append(" | Tel: ").append(e.telefono).append("\n");
         }
+        
         JTextArea textArea = new JTextArea(sb.toString());
         textArea.setEditable(false);
+        textArea.setFont(new Font("Segoe UI", Font.PLAIN, 14));
+        textArea.setBackground(CARD_BG);
+        textArea.setForeground(TEXT_PRIMARY);
+        textArea.setBorder(BorderFactory.createEmptyBorder(15, 15, 15, 15));
 
-        int opcion = JOptionPane.showOptionDialog(null, new JScrollPane(textArea), "Lista de Empleados",
+        int opcion = JOptionPane.showOptionDialog(null, new JScrollPane(textArea), "👥 Lista de Empleados",
                 JOptionPane.DEFAULT_OPTION, JOptionPane.INFORMATION_MESSAGE, null, opciones, opciones[1]);
 
         if (opcion == 0) {
@@ -155,9 +405,14 @@ public class GuarderiaMain {
                 if (index < 0 || index >= empleados.size()) throw new IndexOutOfBoundsException();
                 actualizarEmpleado(index);
             } catch (Exception e) {
-                JOptionPane.showMessageDialog(null, "Número inválido.");
+                mostrarDialogoInfo("Error", "Número invalido.", "error");
             }
         }
+    }
+    
+    static void mostrarDialogoInfo(String titulo, String mensaje, String tipo) {
+        String icono = tipo.equals("error") ? "❌" : tipo.equals("success") ? "✅" : "ℹ️";
+        JOptionPane.showMessageDialog(null, icono + " " + mensaje, titulo, JOptionPane.INFORMATION_MESSAGE);
     }
 
     static void actualizarEmpleado(int index) {
@@ -178,14 +433,14 @@ public class GuarderiaMain {
             emp.cargo = cargo.getText();
             emp.dni = Integer.parseInt(dni.getText());
             emp.telefono = Long.parseLong(telefono.getText());
-            JOptionPane.showMessageDialog(null, "Empleado actualizado.");
+            mostrarDialogoInfo("Exito", "Empleado actualizado correctamente.", "success");
         }, GuarderiaMain::validarEmpleado);
     }
 
     static void mostrarAnimales() {
         String[] opciones = {"Actualizar Animal", "Cerrar"};
         if (animales.isEmpty()) {
-            JOptionPane.showMessageDialog(null, "No hay animales registrados.", "Lista de Animales", JOptionPane.INFORMATION_MESSAGE);
+            mostrarDialogoInfo("Lista de Animales", "No hay animales registrados.", "info");
             return;
         }
 
@@ -204,23 +459,28 @@ public class GuarderiaMain {
                     .append(" | Tel: ").append(a.dueño.telefono)
                     .append("\nHistorial: ").append("Enfermedades: ").append(a.historial.enfermedades)
                     .append(", Vacunas: ").append(a.historial.vacunas)
-                    .append(", Última revisión: ").append(a.historial.ultimaRevision)
+                    .append(", Ultima revisión: ").append(a.historial.ultimaRevision)
                     .append("\n-------------------------------\n");
         }
+        
         JTextArea textArea = new JTextArea(sb.toString());
         textArea.setEditable(false);
+        textArea.setFont(new Font("Segoe UI", Font.PLAIN, 14));
+        textArea.setBackground(CARD_BG);
+        textArea.setForeground(TEXT_PRIMARY);
+        textArea.setBorder(BorderFactory.createEmptyBorder(15, 15, 15, 15));
 
-        int opcion = JOptionPane.showOptionDialog(null, new JScrollPane(textArea), "Lista de Animales",
+        int opcion = JOptionPane.showOptionDialog(null, new JScrollPane(textArea), "🐾 Lista de Animales",
                 JOptionPane.DEFAULT_OPTION, JOptionPane.INFORMATION_MESSAGE, null, opciones, opciones[1]);
 
         if (opcion == 0) {
-            String indexStr = JOptionPane.showInputDialog("Ingrese el número de animal a actualizar:");
+            String indexStr = JOptionPane.showInputDialog("Ingrese el numero de animal a actualizar:");
             try {
                 int index = Integer.parseInt(indexStr);
                 if (index < 0 || index >= animales.size()) throw new IndexOutOfBoundsException();
                 actualizarAnimal(index);
             } catch (Exception e) {
-                JOptionPane.showMessageDialog(null, "Número inválido.");
+                mostrarDialogoInfo("Error", "Numero invalido.", "error");
             }
         }
     }
@@ -247,7 +507,7 @@ public class GuarderiaMain {
                 "Dueño - Teléfono:",
                 "Enfermedades:",
                 "Vacunas:",
-                "Última Revisión (AAAA-MM-DD):"
+                "Ultima Revisión (AAAA-MM-DD):"
         };
         JTextField[] campos = {
                 nombre, especie, dueñoNombre, dueñoApellido,
@@ -264,7 +524,7 @@ public class GuarderiaMain {
             a.historial.enfermedades = enfermedades.getText();
             a.historial.vacunas = vacunas.getText();
             a.historial.ultimaRevision = LocalDate.parse(ultimaRevision.getText());
-            JOptionPane.showMessageDialog(null, "Animal actualizado.");
+            mostrarDialogoInfo("Exito", "Animal actualizado correctamente.", "success");
         }, GuarderiaMain::validarAnimal);
     }
 
@@ -286,7 +546,7 @@ public class GuarderiaMain {
                     Integer.parseInt(dni.getText()),
                     Long.parseLong(telefono.getText())
             ));
-            JOptionPane.showMessageDialog(null, "Empleado agregado.");
+            mostrarDialogoInfo("Exito", "Empleado agregado correctamente.", "success");
         }, GuarderiaMain::validarEmpleado);
     }
 
@@ -310,7 +570,7 @@ public class GuarderiaMain {
                 "Dueño - Teléfono:",
                 "Enfermedades:",
                 "Vacunas:",
-                "Última Revisión (AAAA-MM-DD):"
+                "Ultima Revision (AAAA-MM-DD):"
         };
         JTextField[] campos = {
                 nombre, especie, dueñoNombre, dueñoApellido,
@@ -335,16 +595,25 @@ public class GuarderiaMain {
                     dueño,
                     historial
             ));
-            JOptionPane.showMessageDialog(null, "Animal agregado.");
+            mostrarDialogoInfo("Exito", "Animal agregado correctamente.", "success");
         }, GuarderiaMain::validarAnimal);
     }
 
-    // Método común para mostrar diálogo con validación y resaltado de campos erróneos
+    // Método común para mostrar diálogo con validación y resaltado de campos erróneos - MODERNIZADO
     static void mostrarDialogoValidacion(String titulo, JTextField[] campos, String[] etiquetas, Runnable onSuccess, Validador validador) {
         JDialog dialog = new JDialog((Frame) null, titulo, true);
-        JPanel panel = new JPanel(new GridBagLayout());
+        dialog.setSize(600, 500);
+        dialog.getContentPane().setBackground(CARD_BG);
+        
+        JPanel mainPanel = new JPanel(new BorderLayout(20, 20));
+        mainPanel.setBackground(CARD_BG);
+        mainPanel.setBorder(BorderFactory.createEmptyBorder(25, 25, 25, 25));
+        
+        // Panel del formulario
+        JPanel formPanel = new JPanel(new GridBagLayout());
+        formPanel.setBackground(CARD_BG);
         GridBagConstraints gbc = new GridBagConstraints();
-        gbc.insets = new Insets(5, 5, 5, 5);
+        gbc.insets = new Insets(8, 8, 8, 8);
         gbc.anchor = GridBagConstraints.WEST;
 
         for (int i = 0; i < campos.length; i++) {
@@ -354,40 +623,53 @@ public class GuarderiaMain {
             gbc.weightx = 0.3;
             gbc.fill = GridBagConstraints.NONE;
             JLabel label = new JLabel(etiquetas[i]);
-            label.setPreferredSize(new Dimension(160, 20)); // asegurar ancho para que no corte
-            panel.add(label, gbc);
+            label.setFont(new Font("Segoe UI", Font.BOLD, 14));
+            label.setForeground(TEXT_PRIMARY);
+            label.setPreferredSize(new Dimension(180, 25));
+            formPanel.add(label, gbc);
 
             // Campo
             gbc.gridx = 1;
             gbc.weightx = 0.7;
             gbc.fill = GridBagConstraints.HORIZONTAL;
-            panel.add(campos[i], gbc);
+            
+            // Estilizar campo de texto
+            campos[i].setFont(new Font("Segoe UI", Font.PLAIN, 14));
+            campos[i].setBackground(BACKGROUND);
+            campos[i].setForeground(TEXT_PRIMARY);
+            campos[i].setCaretColor(TEXT_PRIMARY);
+            campos[i].setBorder(BorderFactory.createCompoundBorder(
+                BorderFactory.createLineBorder(new Color(60, 60, 67), 1),
+                BorderFactory.createEmptyBorder(8, 12, 8, 12)
+            ));
+            campos[i].setPreferredSize(new Dimension(250, 35));
+            
+            formPanel.add(campos[i], gbc);
         }
 
-        // Botones en la siguiente fila, columna 0 y 1 con gridwidth=2
-        gbc.gridx = 0;
-        gbc.gridy = campos.length;
-        gbc.gridwidth = 2;
-        gbc.weightx = 0;
-        gbc.fill = GridBagConstraints.NONE;
+        // Panel de botones modernos
+        JPanel buttonPanel = new JPanel(new FlowLayout(FlowLayout.CENTER, 15, 0));
+        buttonPanel.setBackground(CARD_BG);
+        
+        JButton btnOk = crearBotonPrimario("Aceptar");
+        JButton btnCancel = crearBotonSecundario("Cancelar");
+        
+        buttonPanel.add(btnOk);
+        buttonPanel.add(btnCancel);
 
-        JButton btnOk = new JButton("Aceptar");
-        JButton btnCancel = new JButton("Cancelar");
-        JPanel panelBotones = new JPanel();
-        panelBotones.add(btnOk);
-        panelBotones.add(btnCancel);
-
-        panel.add(panelBotones, gbc);
-
-        dialog.getContentPane().add(panel);
-        dialog.pack();
-        dialog.setMinimumSize(new Dimension(450, dialog.getHeight())); // mínimo ancho para que no corte etiquetas
+        mainPanel.add(formPanel, BorderLayout.CENTER);
+        mainPanel.add(buttonPanel, BorderLayout.SOUTH);
+        
+        dialog.add(mainPanel);
         dialog.setLocationRelativeTo(null);
 
         btnOk.addActionListener(e -> {
             // Resetear bordes
             for (JTextField tf : campos) {
-                tf.setBorder(UIManager.getLookAndFeel().getDefaults().getBorder("TextField.border"));
+                tf.setBorder(BorderFactory.createCompoundBorder(
+                    BorderFactory.createLineBorder(new Color(60, 60, 67), 1),
+                    BorderFactory.createEmptyBorder(8, 12, 8, 12)
+                ));
             }
             // Validar
             int[] errores = validador.validar(campos);
@@ -396,20 +678,48 @@ public class GuarderiaMain {
                     onSuccess.run();
                     dialog.dispose();
                 } catch (Exception ex) {
-                    JOptionPane.showMessageDialog(dialog, "Error inesperado: " + ex.getMessage());
+                    mostrarDialogoInfo("Error", "Error inesperado: " + ex.getMessage(), "error");
                 }
             } else {
                 // Marcar bordes en rojo
                 for (int idx : errores) {
-                    campos[idx].setBorder(new LineBorder(Color.RED, 2));
+                    campos[idx].setBorder(BorderFactory.createCompoundBorder(
+                        BorderFactory.createLineBorder(DANGER, 2),
+                        BorderFactory.createEmptyBorder(8, 12, 8, 12)
+                    ));
                 }
-                JOptionPane.showMessageDialog(dialog, "Corrija los campos resaltados en rojo.", "Error en datos", JOptionPane.ERROR_MESSAGE);
+                mostrarDialogoInfo("Validacion", "Corrija los campos resaltados en rojo.", "error");
             }
         });
 
         btnCancel.addActionListener(e -> dialog.dispose());
 
         dialog.setVisible(true);
+    }
+    
+    static JButton crearBotonPrimario(String texto) {
+        JButton boton = new JButton(texto);
+        boton.setFont(new Font("Segoe UI", Font.BOLD, 14));
+        boton.setBackground(SUCCESS);
+        boton.setForeground(TEXT_PRIMARY);
+        boton.setFocusPainted(false);
+        boton.setBorderPainted(false);
+        boton.setPreferredSize(new Dimension(120, 40));
+        boton.setCursor(new Cursor(Cursor.HAND_CURSOR));
+        
+        boton.addMouseListener(new MouseAdapter() {
+            @Override
+            public void mouseEntered(MouseEvent e) {
+                boton.setBackground(SUCCESS_HOVER);
+            }
+            
+            @Override
+            public void mouseExited(MouseEvent e) {
+                boton.setBackground(SUCCESS);
+            }
+        });
+        
+        return boton;
     }
 
     // Interfaz funcional para validador
