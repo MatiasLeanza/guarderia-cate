@@ -71,7 +71,6 @@ public class GuarderiaMain {
     static ArrayList<Empleado> empleados = new ArrayList<>();
     static ArrayList<Animal> animales = new ArrayList<>();
     
-    // Colores del tema moderno
     static final Color BACKGROUND = new Color(18, 18, 18);           // Fondo oscuro principal
     static final Color CARD_BG = new Color(28, 28, 30);             // Fondo de tarjetas
     static final Color PRIMARY = new Color(0, 122, 255);            // Azul principal
@@ -88,15 +87,14 @@ public class GuarderiaMain {
     static final Color PURPLE_HOVER = new Color(185, 92, 232);      // Púrpura hover
 
     public static void main(String[] args) {
-        // Configurar look and feel más moderno
+        
         try {
             UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
         } catch (Exception e) {
-            // Si hay error, usar el look and feel por defecto
+         
             try {
                 UIManager.setLookAndFeel(UIManager.getCrossPlatformLookAndFeelClassName());
             } catch (Exception ex) {
-                // Continuar con el look and feel por defecto
             }
         }
         
@@ -104,25 +102,25 @@ public class GuarderiaMain {
     }
 
     public static void crearVentanaPrincipal() {
-        JFrame ventana = new JFrame("Guarderia de Mascotas - Sistema de Gestión");
+        JFrame ventana = new JFrame("Guarderia de Mascotas");
         ventana.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         ventana.setSize(900, 700);
         ventana.setMinimumSize(new Dimension(800, 600));
         ventana.getContentPane().setBackground(BACKGROUND);
         
-        // Panel principal con padding
+        
         JPanel mainPanel = new JPanel();
         mainPanel.setLayout(new BorderLayout(20, 20));
         mainPanel.setBackground(BACKGROUND);
         mainPanel.setBorder(BorderFactory.createEmptyBorder(30, 30, 30, 30));
         
-        // Header con título y subtítulo
+        
         JPanel headerPanel = crearHeader();
         
-        // Panel de botones con grid moderno
+        
         JPanel buttonPanel = crearPanelBotones();
         
-        // Footer con información
+        
         JPanel footerPanel = crearFooter();
         
         mainPanel.add(headerPanel, BorderLayout.NORTH);
@@ -140,19 +138,19 @@ public class GuarderiaMain {
         header.setBackground(BACKGROUND);
         header.setBorder(BorderFactory.createEmptyBorder(0, 0, 20, 0));
         
-        // Título principal
+        
         JLabel titulo = new JLabel("Guarderia de Mascotas");
         titulo.setFont(new Font("Segoe UI", Font.BOLD, 32));
         titulo.setForeground(TEXT_PRIMARY);
         titulo.setAlignmentX(Component.CENTER_ALIGNMENT);
         
-        // Subtítulo
-        JLabel subtitulo = new JLabel("Sistema de Gestion Integral");
+        
+        JLabel subtitulo = new JLabel("Gestionamiento de datos");
         subtitulo.setFont(new Font("Segoe UI", Font.PLAIN, 16));
         subtitulo.setForeground(TEXT_SECONDARY);
         subtitulo.setAlignmentX(Component.CENTER_ALIGNMENT);
         
-        // Línea decorativa
+        
         JPanel linePanel = new JPanel();
         linePanel.setBackground(PRIMARY);
         linePanel.setPreferredSize(new Dimension(200, 3));
@@ -176,13 +174,13 @@ public class GuarderiaMain {
         panel.setBackground(BACKGROUND);
         GridBagConstraints gbc = new GridBagConstraints();
         
-        // Configuración base para botones
+       
         gbc.insets = new Insets(15, 15, 15, 15);
         gbc.fill = GridBagConstraints.BOTH;
         gbc.weightx = 1.0;
         gbc.weighty = 1.0;
         
-        // Crear botones modernos
+        
         JButton btnDatosGuarderia = crearBotonModerno("Datos Guarderia", "Información de la guarderia", PRIMARY, PRIMARY_HOVER);
         JButton btnDatosEmpleados = crearBotonModerno("Ver Empleados", "Lista de empleados registrados", SUCCESS, SUCCESS_HOVER);
         JButton btnDatosAnimales = crearBotonModerno("Ver Animales", "Lista de mascotas registradas", PURPLE, PURPLE_HOVER);
@@ -190,14 +188,14 @@ public class GuarderiaMain {
         JButton btnAgregarAnimal = crearBotonModerno("Agregar Animal", "Registrar nueva mascota", new Color(255, 45, 85), new Color(255, 55, 95));
         JButton btnSalir = crearBotonModerno("Salir", "Cerrar aplicacion", DANGER, DANGER_HOVER);
         
-        // Agregar funcionalidad a botones
+
         btnDatosGuarderia.addActionListener(e -> mostrarDatosGuarderia());
         btnDatosEmpleados.addActionListener(e -> mostrarEmpleados());
         btnDatosAnimales.addActionListener(e -> mostrarAnimales());
         btnAgregarEmpleado.addActionListener(e -> agregarEmpleado());
         btnAgregarAnimal.addActionListener(e -> agregarAnimal());
         btnSalir.addActionListener(e -> {
-            // Usar un dialogo personalizado para confirmar la salida
+            
             JDialog confirmDialog = crearDialogoBase("Confirmar Salida", 400, 150, DANGER);
             confirmDialog.setLayout(new BorderLayout(10, 10));
             confirmDialog.setDefaultCloseOperation(JDialog.DISPOSE_ON_CLOSE);
@@ -217,7 +215,7 @@ public class GuarderiaMain {
             btnPanel.setBackground(CARD_BG);
             
             JButton yesButton = crearBotonPrimario("Sí");
-            yesButton.setBackground(DANGER); // Botón de confirmación de salida en rojo
+            yesButton.setBackground(DANGER); 
             yesButton.addMouseListener(new MouseAdapter() {
                 @Override
                 public void mouseEntered(MouseEvent e) { yesButton.setBackground(DANGER_HOVER); }
@@ -240,7 +238,7 @@ public class GuarderiaMain {
             confirmDialog.setVisible(true);
         });
         
-        // Layout 2x3
+        
         gbc.gridx = 0; gbc.gridy = 0;
         panel.add(btnDatosGuarderia, gbc);
         
@@ -273,19 +271,19 @@ public class GuarderiaMain {
         boton.setOpaque(true);
         boton.setCursor(new Cursor(Cursor.HAND_CURSOR));
         
-        // Panel interno para el contenido
+        
         JPanel contenido = new JPanel();
         contenido.setLayout(new BoxLayout(contenido, BoxLayout.Y_AXIS));
         contenido.setOpaque(false);
         contenido.setBorder(BorderFactory.createEmptyBorder(15, 15, 15, 15));
         
-        // Texto principal
+        
         JLabel lblTexto = new JLabel(texto);
         lblTexto.setFont(new Font("Segoe UI", Font.BOLD, 16));
         lblTexto.setForeground(TEXT_PRIMARY);
         lblTexto.setAlignmentX(Component.CENTER_ALIGNMENT);
         
-        // Descripción
+        
         JLabel lblDesc = new JLabel("<html><center>" + descripcion + "</center></html>");
         lblDesc.setFont(new Font("Segoe UI", Font.PLAIN, 12));
         lblDesc.setForeground(new Color(255, 255, 255, 180));
@@ -297,7 +295,6 @@ public class GuarderiaMain {
         
         boton.add(contenido, BorderLayout.CENTER);
         
-        // Efectos hover
         boton.addMouseListener(new MouseAdapter() {
             @Override
             public void mouseEntered(MouseEvent e) {
@@ -327,9 +324,7 @@ public class GuarderiaMain {
         return footer;
     }
 
-    // --- Métodos de diálogo personalizados ---
 
-    // Nuevo método para crear un JDialog base con estilo moderno
     static JDialog crearDialogoBase(String titulo, int width, int height, Color accentColor) {
         JDialog dialog = new JDialog((Frame) null, titulo, true);
         dialog.setSize(width, height);
@@ -337,7 +332,6 @@ public class GuarderiaMain {
         dialog.setLayout(new BorderLayout());
         dialog.setResizable(false); 
 
-        // Añadir un borde superior con el color de acento
         JPanel contentPanel = new JPanel(new BorderLayout(15, 15));
         contentPanel.setBackground(CARD_BG);
         contentPanel.setBorder(BorderFactory.createCompoundBorder(
@@ -349,7 +343,6 @@ public class GuarderiaMain {
         return dialog;
     }
 
-    // Método general para mostrar información (antes JOptionPane.showMessageDialog)
     static void mostrarDialogoInfo(String titulo, String mensaje, String tipo) {
         Color accentColor;
         if ("error".equals(tipo)) {
@@ -364,18 +357,15 @@ public class GuarderiaMain {
         JPanel contentPanel = (JPanel) dialog.getContentPane();
         contentPanel.setLayout(new BorderLayout(20, 20));
 
-        // Título estilizado
         JLabel titleLabel = new JLabel(titulo);
         titleLabel.setFont(new Font("Segoe UI", Font.BOLD, 22));
         titleLabel.setForeground(TEXT_PRIMARY);
         contentPanel.add(titleLabel, BorderLayout.NORTH);
 
-        // Mensaje estilizado
         JLabel msgLabel = new JLabel("<html><center>" + mensaje + "</center></html>", SwingConstants.CENTER);
         msgLabel.setFont(new Font("Segoe UI", Font.PLAIN, 16));
         msgLabel.setForeground(TEXT_PRIMARY);
 
-        // Botón de Aceptar
         JButton btnOk = crearBotonPrimario("Aceptar");
         btnOk.addActionListener(e -> dialog.dispose());
         
@@ -461,11 +451,14 @@ public class GuarderiaMain {
         StringBuilder sb = new StringBuilder();
         for (int i = 0; i < empleados.size(); i++) {
             Empleado e = empleados.get(i);
-            sb.append(i).append(") ")
-                    .append("Nombre: ").append(e.nombre).append(" ").append(e.apellido)
-                    .append(" | Cargo: ").append(e.cargo)
-                    .append(" | DNI: ").append(e.dni)
-                    .append(" | Tel: ").append(e.telefono).append("\n");
+            sb.append(i).append(")")
+                    .append("\n | Nombre y Apellido: ").append(e.nombre).append(" ").append(e.apellido).append("\n")
+                    .append(" | Cargo: ").append(e.cargo).append("\n")
+                    .append(" | DNI: ").append(e.dni).append("\n")
+                    .append(" | Tel: ").append(e.telefono).append("\n")
+                    .append("\n-------------------------------\n");
+                    ;
+            
         }
         
         JTextArea textArea = new JTextArea(sb.toString());
@@ -528,7 +521,7 @@ public class GuarderiaMain {
             return;
         }
 
-        JDialog dialog = crearDialogoBase("Lista de Animales", 700, 500, PURPLE); 
+        JDialog dialog = crearDialogoBase("Lista de Animales", 800, 600, PURPLE); 
         JPanel contentPanel = (JPanel) dialog.getContentPane();
 
         JLabel titleLabel = new JLabel("Lista de Animales");
@@ -539,19 +532,19 @@ public class GuarderiaMain {
         StringBuilder sb = new StringBuilder();
         for (int i = 0; i < animales.size(); i++) {
             Animal a = animales.get(i);
-            sb.append(i).append(") Animal: ").append(a.nombre)
-                    .append(" | Especie: ");
+            sb.append(i).append(")").append("\n | Animal: ").append(a.nombre)
+                    .append("\n | Especie: ");
             if (!a.especie.equalsIgnoreCase("perro") && !a.especie.equalsIgnoreCase("gato")) {
                 sb.append("Otro Animal: ").append(a.especie);
             } else {
                 sb.append(a.especie);
             }
-            sb.append("\nDueño: ").append(a.dueño.nombre).append(" ").append(a.dueño.apellido)
-                    .append(" | DNI: ").append(a.dueño.dni)
-                    .append(" | Tel: ").append(a.dueño.telefono)
-                    .append("\nHistorial: ").append("Enfermedades: ").append(a.historial.enfermedades)
-                    .append(", Vacunas: ").append(a.historial.vacunas)
-                    .append(", Ultima revisión: ").append(a.historial.ultimaRevision)
+            sb.append("\n | Dueño: ").append(a.dueño.nombre).append(" ").append(a.dueño.apellido).append("\n")
+                    .append(" | DNI: ").append(a.dueño.dni).append("\n")
+                    .append(" | Tel: ").append(a.dueño.telefono).append("\n")
+                    .append("\nHistorial: ").append("\n | Enfermedades: ").append(a.historial.enfermedades).append("\n")
+                    .append(" | Vacunas: ").append(a.historial.vacunas).append("\n")
+                    .append(" | Ultima revisión: ").append(a.historial.ultimaRevision).append("\n")
                     .append("\n-------------------------------\n");
         }
         
@@ -694,57 +687,59 @@ public class GuarderiaMain {
         }, GuarderiaMain::validarEmpleado, WARNING); 
     }
 
-    static void agregarAnimal() {
-        JTextField nombre = new JTextField();
-        JTextField especie = new JTextField();
-        JTextField dueñoNombre = new JTextField();
-        JTextField dueñoApellido = new JTextField();
-        JTextField dueñoDni = new JTextField();
-        JTextField dueñoTelefono = new JTextField();
-        JTextField enfermedades = new JTextField();
-        JTextField vacunas = new JTextField();
-        JTextField ultimaRevision = new JTextField();
+    private static void agregarAnimal() {
+        // Campos de texto con el nombre del animal incluido
+        JTextField txtNombre = new JTextField(15);
+        JTextField txtEspecie = new JTextField(15);
+        JTextField txtDuenoNombre = new JTextField(15);
+        JTextField txtDuenoApellido = new JTextField(15);
+        JTextField txtDuenoDNI = new JTextField(15);
+        JTextField txtDuenoTelefono = new JTextField(15);
+        JTextField txtEnfermedades = new JTextField(15);
+        JTextField txtVacunas = new JTextField(15);
+        JTextField txtUltimaRevision = new JTextField(15);
 
+        // Etiquetas corregidas
         String[] etiquetas = {
-                "Nombre del animal:",
-                "Especie:",
-                "Dueño - Nombre:",
-                "Dueño - Apellido:",
-                "Dueño - DNI:",
-                "Dueño - Teléfono:",
-                "Enfermedades:",
-                "Vacunas:",
-                "Ultima Revision (AAAA-MM-DD):"
+            "Nombre del animal:",
+            "Especie:", 
+            "Dueño - Nombre:", 
+            "Dueño - Apellido:", 
+            "Dueño - DNI:",
+            "Dueño - Teléfono:", 
+            "Enfermedades:", 
+            "Vacunas:", 
+            "Última revisión (AAAA-MM-DD):"
         };
+
         JTextField[] campos = {
-                nombre, especie, dueñoNombre, dueñoApellido,
-                dueñoDni, dueñoTelefono, enfermedades, vacunas, ultimaRevision
+            txtNombre, txtEspecie, txtDuenoNombre, txtDuenoApellido, txtDuenoDNI,
+            txtDuenoTelefono, txtEnfermedades, txtVacunas, txtUltimaRevision
         };
 
         mostrarDialogoValidacion("Agregar Animal", campos, etiquetas, () -> {
-            Dueño dueño = new Dueño(
-                    dueñoNombre.getText(),
-                    dueñoApellido.getText(),
-                    Integer.parseInt(dueñoDni.getText()),
-                    Long.parseLong(dueñoTelefono.getText())
-            );
-            HistorialMedico historial = new HistorialMedico(
-                    enfermedades.getText(),
-                    vacunas.getText(),
-                    LocalDate.parse(ultimaRevision.getText())
-            );
-            animales.add(new Animal(
-                    nombre.getText(),
-                    especie.getText(),
-                    dueño,
-                    historial
-            ));
-            mostrarDialogoInfo("Exito", "Animal agregado correctamente.", "success");
-        }, GuarderiaMain::validarAnimal, new Color(255, 45, 85)); 
+            String nombre = txtNombre.getText();
+            String especie = txtEspecie.getText();
+            String duenoNombre = txtDuenoNombre.getText();
+            String duenoApellido = txtDuenoApellido.getText();
+            int dni = Integer.parseInt(txtDuenoDNI.getText());
+            long telefono = Long.parseLong(txtDuenoTelefono.getText());
+            String enfermedades = txtEnfermedades.getText();
+            String vacunas = txtVacunas.getText();
+            LocalDate ultimaRevision = LocalDate.parse(txtUltimaRevision.getText());
+
+            Dueño dueno = new Dueño(duenoNombre, duenoApellido, dni, telefono);
+            HistorialMedico historial = new HistorialMedico(enfermedades, vacunas, ultimaRevision);
+            Animal animal = new Animal(nombre, especie, dueno, historial);
+
+            animales.add(animal);
+            mostrarDialogoInfo("Éxito", "Animal agregado correctamente.", "success");
+        }, GuarderiaMain::validarAnimal, new Color(255, 45, 85));
     }
 
+
     static void mostrarDialogoValidacion(String titulo, JTextField[] campos, String[] etiquetas, Runnable onSuccess, Validador validador, Color accentColor) {
-        JDialog dialog = crearDialogoBase(titulo, 600, 550, accentColor);
+        JDialog dialog = crearDialogoBase(titulo, 650, 600, accentColor);
         JPanel mainPanel = (JPanel) dialog.getContentPane();
         mainPanel.setLayout(new BorderLayout(20, 20)); 
 
@@ -753,6 +748,7 @@ public class GuarderiaMain {
         titleLabel.setForeground(TEXT_PRIMARY);
         mainPanel.add(titleLabel, BorderLayout.NORTH);
 
+        // Panel principal con scroll
         JPanel formPanel = new JPanel(new GridBagLayout());
         formPanel.setBackground(CARD_BG);
         GridBagConstraints gbc = new GridBagConstraints();
@@ -787,6 +783,13 @@ public class GuarderiaMain {
             formPanel.add(campos[i], gbc);
         }
 
+        // Agregar scroll al formulario
+        JScrollPane scrollPane = new JScrollPane(formPanel);
+        scrollPane.setBorder(null);
+        scrollPane.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED);
+        scrollPane.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
+        scrollPane.getVerticalScrollBar().setUI(new ModernScrollBarUI());
+
         JPanel buttonPanel = new JPanel(new FlowLayout(FlowLayout.CENTER, 15, 0));
         buttonPanel.setBackground(CARD_BG);
         
@@ -796,7 +799,7 @@ public class GuarderiaMain {
         buttonPanel.add(btnOk);
         buttonPanel.add(btnCancel);
 
-        mainPanel.add(formPanel, BorderLayout.CENTER);
+        mainPanel.add(scrollPane, BorderLayout.CENTER);
         mainPanel.add(buttonPanel, BorderLayout.SOUTH);
         
         dialog.setLocationRelativeTo(null);
@@ -908,10 +911,10 @@ public class GuarderiaMain {
 
     static int[] validarAnimal(JTextField[] campos) {
         List<Integer> errores = new ArrayList<>();
-        if (campos[0].getText().trim().isEmpty()) errores.add(0); 
-        if (campos[1].getText().trim().isEmpty()) errores.add(1); 
-        if (campos[2].getText().trim().isEmpty()) errores.add(2); 
-        if (campos[3].getText().trim().isEmpty()) errores.add(3); 
+        if (campos[0].getText().trim().isEmpty()) errores.add(0); // Nombre del animal
+        if (campos[1].getText().trim().isEmpty()) errores.add(1); // Especie
+        if (campos[2].getText().trim().isEmpty()) errores.add(2); // Dueño nombre
+        if (campos[3].getText().trim().isEmpty()) errores.add(3); // Dueño apellido
         try {
             int dni = Integer.parseInt(campos[4].getText().trim());
             if (dni <= 0) errores.add(4);
@@ -924,6 +927,7 @@ public class GuarderiaMain {
         } catch (NumberFormatException e) {
             errores.add(5);
         }
+        // Enfermedades y vacunas pueden estar vacías, no las validamos
         try {
             LocalDate.parse(campos[8].getText().trim());
         } catch (DateTimeParseException e) {
